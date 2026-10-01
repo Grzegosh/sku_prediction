@@ -1,0 +1,7 @@
+postgres:
+  database: grzegorznaporowski
+  user: grzegorznaporowski
+  host: localhost
+  queries:
+    create_dev_db: sql/create_dev_db.sql
+    create_prod_db: sql/create_prod_db.sql
