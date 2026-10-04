@@ -1,7 +1,9 @@
 postgres:
   database: grzegorznaporowski
-  user: grzegorznaporowski
+  user: grzegorznaporowski # default user for me.
   host: localhost
   queries:
     create_dev_db: sql/create_dev_db.sql
     create_prod_db: sql/create_prod_db.sql
+    create_schemas: sql/create_schemas.sql
+    

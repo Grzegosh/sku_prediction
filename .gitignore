@@ -219,3 +219,4 @@ __marimo__/
 logs
 .DS_Store
 python/tests.py
+main.py
