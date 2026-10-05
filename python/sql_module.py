@@ -89,6 +89,29 @@ class SQL:
         except Exception as e:
             print(f"Error executing query: {e}")
 
+    def create_tables(self, database_name: str = 'dev') -> None:
+        """
+        Function that creates tables in particular
+        database in bronze schema.
+        Params:
+            database_name (str): The name of the database in which tables will be created. Can contain only two values: 'dev' or 'prod'.
+        """
+        if database_name not in ['dev', 'prod']:
+            raise ValueError(f"Invalid database name '{database_name}'. Must be 'dev' or 'prod'.")
+
+        conn = self.create_connection(database=database_name)
+        queries = ['create_dim_category','create_dim_customer','create_dim_date','create_dim_product','create_fact_sales']
+
+        for query_key in queries:
+            query = self.read_query(query_key)
+            try:
+                with conn.cursor() as cursor:
+                    cursor.execute(query)
+                    print(f"Query {query} executed successfully.")
+                    cursor.close()
+            except Exception as e:
+                print(f"Error executing query: {e}")
+
     
     def setup_pipeline(self) -> None:
         """
@@ -99,8 +122,7 @@ class SQL:
         self.create_database("prod")
         self.create_schemas("dev")
         self.create_schemas("prod")
-                
-
-    
+        self.create_tables("dev")
+        self.create_tables("prod")
 
     

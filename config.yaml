@@ -6,4 +6,10 @@ postgres:
     create_dev_db: sql/create_dev_db.sql
     create_prod_db: sql/create_prod_db.sql
     create_schemas: sql/create_schemas.sql
+    create_dim_category: sql/dim_category.sql
+    create_dim_customer: sql/dim_customer.sql
+    create_dim_date: sql/dim_date.sql
+    create_dim_product: sql/dim_product.sql
+    create_fact_sales: sql/fact_sales.sql
+    
     
