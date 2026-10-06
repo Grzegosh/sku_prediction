@@ -7,5 +7,4 @@ CREATE TABLE bronze.source_category (
     ingested_at DATE NOT NULL,
 
     CONSTRAINT pk_category_id PRIMARY KEY (category_id, ingested_at)
-) 
-PARTITION BY RANGE (ingested_at);
+);

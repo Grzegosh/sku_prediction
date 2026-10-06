@@ -1,4 +1,8 @@
 from python.config_module import Config
+from pathlib import Path
+import pandas as pd 
+from sqlalchemy import create_engine
+import os 
 import psycopg2
 
 class SQL:
@@ -24,6 +28,10 @@ class SQL:
             return conn
         except psycopg2.OperationalError as e:
             raise ConnectionError(f"Failed to connect to the database: {e}")
+
+    def create_sqlalchemy_connection(self, database:str = None):
+        engine = create_engine(f'postgresql+psycopg2://{self.user}:password@{self.host}/{database}')
+        return engine
 
     def read_query(self, query: str) -> str:
         """
@@ -111,6 +119,53 @@ class SQL:
                     cursor.close()
             except Exception as e:
                 print(f"Error executing query: {e}")
+
+    def load_data_into_bronze(self, database_name: str = 'dev', table: str = None) -> None:
+        """
+        Function that loades data into specific table.
+        Params:
+            table: A name of the table in the bronze layer. Can be 'customer','category','date','product' or 'sales'.
+            database_name: A name of the database name. Can be 'dev' or 'prod'.
+        """
+        if database_name not in ['dev', 'prod']:
+            raise ValueError(f"Invalid database name '{database_name}'. Must be 'dev' or 'prod'.")
+
+        if table not in ['category', 'customer', 'date', 'product', 'sales']:
+            raise ValueError(f"Invalid table name '{table}'. Must be 'category', 'customer', 'date', 'product' or 'sales'.")
+
+        conn = self.create_sqlalchemy_connection('dev')
+        base_data_path = Path(__file__).parent.parent / 'data'
+        suffix = '.parquet'
+        if table == 'category':
+            base_dir = Path(base_data_path) / 'dim_category'
+            _dirs = os.listdir(base_dir)
+
+            for dir in _dirs:
+                data_folder_path = Path(base_dir) / f'{dir}'
+                __dirs = os.listdir(data_folder_path)
+                filenames = [file for file in __dirs if file.endswith(suffix)]
+                for data_file in filenames:
+                    full_data_path = data_folder_path / f'{data_file}'
+                    df = pd.read_parquet(full_data_path)
+                    df.rename(columns={
+                        '_source_system': 'source_system'
+                        ,'_ingested_at': 'ingested_at'
+                    }, inplace=True)
+                    try:
+                        df.to_sql(
+                            name='source_category',
+                            schema='bronze',
+                            if_exists='append',
+                            index=False,
+                            con=conn
+                        )
+                    except Exception as e:
+                        print(f"Error executing: {e}")
+
+                
+            
+            
+        
 
     
     def setup_pipeline(self) -> None:
