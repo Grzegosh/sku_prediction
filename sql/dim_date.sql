@@ -1,5 +1,5 @@
-CREATE TABLE bronze.source_data (
-    date BIGINT PRIMARY KEY,
+CREATE TABLE bronze.source_date (
+    date TIMESTAMP PRIMARY KEY,
     weekday VARCHAR(1) NOT NULL,
     is_weekend BOOLEAN NOT NULL,
     day_of_year INT NOT NULL,
@@ -10,5 +10,5 @@ CREATE TABLE bronze.source_data (
     is_payday_window BOOLEAN NOT NULL,
     temperature_c FLOAT,
     source_system VARCHAR(50),
-    ingested_at BIGINT
+    ingested_at TIMESTAMP
 );

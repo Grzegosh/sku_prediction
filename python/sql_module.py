@@ -133,7 +133,7 @@ class SQL:
         if table not in ['category', 'customer', 'date', 'product', 'sales']:
             raise ValueError(f"Invalid table name '{table}'. Must be 'category', 'customer', 'date', 'product' or 'sales'.")
 
-        conn = self.create_sqlalchemy_connection('dev')
+        conn = self.create_sqlalchemy_connection(database=database_name)
         base_data_path = Path(__file__).parent.parent / 'data'
         suffix = '.parquet'
         if table == 'category':
@@ -160,24 +160,130 @@ class SQL:
                             con=conn
                         )
                     except Exception as e:
-                        print(f"Error executing: {e}")
+                        print(f"Error executing: {str(e).split("DETAIL")[0]}")
 
-                
-            
-            
-        
+        elif table == 'customer':
+            base_dir = Path(base_data_path) / 'dim_customer'
+            _dirs = os.listdir(base_dir)
 
+            for dir in _dirs:
+                data_folder_path = Path(base_dir) / f'{dir}'
+                __dirs = os.listdir(data_folder_path)
+                filenames = [file for file in __dirs if file.endswith(suffix)]
+                for data_file in filenames:
+                    full_data_path = data_folder_path / f'{data_file}'
+                    df = pd.read_parquet(full_data_path)
+                    df.rename(columns={
+                        '_source_system': 'source_system'
+                        ,'_ingested_at': 'ingested_at'
+                        ,'customer_id': 'id'
+                    }, inplace=True)
+                    try:
+                        df.to_sql(
+                            name='source_customer',
+                            schema='bronze',
+                            if_exists='append',
+                            index=False,
+                            con=conn
+                        )
+                    except Exception as e:
+                        print(f"Error executing: {str(e).split("DETAIL")[0]}")
+
+        elif table == 'date':
+            base_dir = Path(base_data_path) / 'dim_date'
+            _dirs = os.listdir(base_dir)
+
+            for dir in _dirs:
+                data_folder_path = Path(base_dir) / f'{dir}'
+                __dirs = os.listdir(data_folder_path)
+                filenames = [file for file in __dirs if file.endswith(suffix)]
+                for data_file in filenames:
+                    full_data_path = data_folder_path / f'{data_file}'
+                    df = pd.read_parquet(full_data_path)
+                    df.rename(columns={
+                        '_source_system': 'source_system'
+                        ,'_ingested_at': 'ingested_at'
+                        ,'customer_id': 'id'
+                    }, inplace=True)
+                    try:
+                        df.to_sql(
+                            name='source_date',
+                            schema='bronze',
+                            if_exists='append',
+                            index=False,
+                            con=conn
+                        )
+                    except Exception as e:
+                        print(f"Error executing: {str(e).split("DETAIL")[0]}")
+
+        elif table == 'product':
+                base_dir = Path(base_data_path) / 'dim_product'
+                _dirs = os.listdir(base_dir)
     
+                for dir in _dirs:
+                    data_folder_path = Path(base_dir) / f'{dir}'
+                    __dirs = os.listdir(data_folder_path)
+                    filenames = [file for file in __dirs if file.endswith(suffix)]
+                    for data_file in filenames:
+                        full_data_path = data_folder_path / f'{data_file}'
+                        df = pd.read_parquet(full_data_path)
+                        df.rename(columns={
+                            '_source_system': 'source_system'
+                            ,'_ingested_at': 'ingested_at'
+                            ,'sku_id': 'id'
+                        }, inplace=True)
+                        try:
+                            df.to_sql(
+                                name='source_product',
+                                schema='bronze',
+                                if_exists='append',
+                                index=False,
+                                con=conn
+                            )
+                        except Exception as e:
+                            print(f"Error executing: {str(e).split("DETAIL")[0]}")
+
+        else:
+            base_dir = Path(base_data_path) / 'fact_sales'
+            _dirs = os.listdir(base_dir)
+            for dir in _dirs:
+                data_folder_path = Path(base_dir) / f'{dir}'
+                __dirs = os.listdir(data_folder_path)
+                filenames = [file for file in __dirs if file.endswith(suffix)]
+                for data_file in filenames:
+                    full_data_path = data_folder_path / f'{data_file}'
+                    df = pd.read_parquet(full_data_path)
+                    df['discount_pct_raw'] = df['discount_pct_raw'].fillna(0.0)
+                    df['discount_pct_raw'] = df['discount_pct_raw'].replace('',0)
+                    df['unit_price_raw'] = [float(str(x).split(' ')[0].replace(',','.')) for x in df['unit_price_raw']]
+                    df['order_ts_raw'] = pd.to_datetime(df['order_ts_raw'], format='mixed').dt.strftime('%Y-%m-%d')
+                    try:
+                        df.to_sql(
+                            name='source_sales',
+                            schema='bronze',
+                            if_exists='append',
+                            index=False,
+                            con=conn
+                        )
+                    except Exception as e:
+                        print(f"Error executing: {str(e).split("DETAIL")[0]}")
+
+ 
     def setup_pipeline(self) -> None:
         """
         Function that sets up the entire pipeline by creating databases
         and schemas as specified in the configuration file.
+        It's also responsible for ingesting the raw data into the bronze schema.
         """
-        self.create_database("dev")
-        self.create_database("prod")
-        self.create_schemas("dev")
-        self.create_schemas("prod")
-        self.create_tables("dev")
-        self.create_tables("prod")
+        for database in ['dev', 'prod']:
+            self.create_database(database_name=database)
+            self.create_schemas(database_name=database)
+            self.create_tables(database_name=database)
+            for table in ['category', 'customer', 'date', 'product', 'sales']:
+                self.load_data_into_bronze(
+                    database_name=database,
+                    table=table
+                )
+
 
     

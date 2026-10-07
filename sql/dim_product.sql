@@ -7,12 +7,11 @@ CREATE TABLE bronze.source_product (
     base_price FLOAT,
     current_price FLOAT,
     popularity_index FLOAT,
-    launch_date BIGINT,
-    discontinued_date BIGINT,
+    launch_date TIMESTAMP,
+    discontinued_date TIMESTAMP,
     is_active BOOLEAN,
     source_system VARCHAR(50),
     ingested_at DATE NOT NULL,
 
     CONSTRAINT pk_product PRIMARY KEY (id, ingested_at)
-)
-    PARTITION BY RANGE (ingested_at);
+);
