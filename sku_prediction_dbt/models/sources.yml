@@ -1,0 +1,18 @@
+sources:
+  - name: sku_prediction
+    schema: bronze_sku
+    tables:
+    - name: category
+      identifier: source_category
+
+    - name: customer
+      identifier: source_customer
+
+    - name: date
+      identifier: source_date
+
+    - name: product
+      identifier: source_product
+
+    - name: sales
+      identifier: source_sales

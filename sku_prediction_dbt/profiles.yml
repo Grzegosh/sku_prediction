@@ -1,0 +1,23 @@
+grzegorz_profile:  # Profile name (matches dbt_project.yml)
+  target: dev  # Default target to use
+  outputs:
+    dev: # Development environment
+      type: postgres
+      threads: 4
+      host: localhost
+      port: 5432
+      user: grzegorznaporowski
+      password: ''
+      dbname: dev
+      schema: silver_sku
+  
+
+    prod: # prod
+      type: postgres
+      threads: 4
+      host: localhost
+      port: 5432
+      user: grzegorznaporowski
+      password: ''
+      dbname: prod
+      schema: silver_sku
