@@ -1,4 +1,4 @@
-CREATE TABLE bronze.source_date (
+CREATE TABLE bronze_sku.source_date (
     date TIMESTAMP PRIMARY KEY,
     weekday VARCHAR(1) NOT NULL,
     is_weekend BOOLEAN NOT NULL,

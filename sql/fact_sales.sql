@@ -1,4 +1,4 @@
-CREATE TABLE bronze.source_sales (
+CREATE TABLE bronze_sku.source_sales (
     order_id VARCHAR(50),
     order_line_id INT,
     sku_id_raw VARCHAR(50),

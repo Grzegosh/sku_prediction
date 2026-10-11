@@ -154,7 +154,7 @@ class SQL:
                     try:
                         df.to_sql(
                             name='source_category',
-                            schema='bronze',
+                            schema='bronze_sku',
                             if_exists='append',
                             index=False,
                             con=conn
@@ -181,7 +181,7 @@ class SQL:
                     try:
                         df.to_sql(
                             name='source_customer',
-                            schema='bronze',
+                            schema='bronze_sku',
                             if_exists='append',
                             index=False,
                             con=conn
@@ -208,7 +208,7 @@ class SQL:
                     try:
                         df.to_sql(
                             name='source_date',
-                            schema='bronze',
+                            schema='bronze_sku',
                             if_exists='append',
                             index=False,
                             con=conn
@@ -235,7 +235,7 @@ class SQL:
                         try:
                             df.to_sql(
                                 name='source_product',
-                                schema='bronze',
+                                schema='bronze_sku',
                                 if_exists='append',
                                 index=False,
                                 con=conn
@@ -260,7 +260,7 @@ class SQL:
                     try:
                         df.to_sql(
                             name='source_sales',
-                            schema='bronze',
+                            schema='bronze_sku',
                             if_exists='append',
                             index=False,
                             con=conn
@@ -273,7 +273,7 @@ class SQL:
         """
         Function that sets up the entire pipeline by creating databases
         and schemas as specified in the configuration file.
-        It's also responsible for ingesting the raw data into the bronze schema.
+        It's also responsible for ingesting the raw data into the bronze_sku schema.
         """
         for database in ['dev', 'prod']:
             self.create_database(database_name=database)

@@ -1,4 +1,4 @@
-CREATE TABLE bronze.source_category (
+CREATE TABLE bronze_sku.source_category (
     category_id INT,
     category_code VARCHAR(50),
     category_name VARCHAR(100),

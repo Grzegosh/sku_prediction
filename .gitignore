@@ -220,3 +220,7 @@ logs
 .DS_Store
 python/tests.py
 main.py
+
+
+# Dbt 
+.user.yml

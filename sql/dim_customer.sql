@@ -1,4 +1,4 @@
-CREATE TABLE bronze.source_customer (
+CREATE TABLE bronze_sku.source_customer (
     id VARCHAR(50),
     registration_date TIMESTAMP,
     segment VARCHAR(10),

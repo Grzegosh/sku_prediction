@@ -1,3 +1,3 @@
-CREATE SCHEMA bronze;
-CREATE SCHEMA silver;
-CREATE SCHEMA gold;
+CREATE SCHEMA bronze_sku;
+CREATE SCHEMA silver_sku;
+CREATE SCHEMA gold_sku;

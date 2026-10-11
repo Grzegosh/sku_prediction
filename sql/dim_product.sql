@@ -1,4 +1,4 @@
-CREATE TABLE bronze.source_product (
+CREATE TABLE bronze_sku.source_product (
     id VARCHAR(100),
     sku_name VARCHAR(255),
     category_code VARCHAR(100),
