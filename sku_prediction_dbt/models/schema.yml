@@ -1,0 +1,44 @@
+models:
+  - name: dim_date
+    columns:
+      - name: date
+        data_tests:
+          - unique
+          - not_null
+
+  - name: dim_holiday
+    columns:  
+      - name: date
+        data_tests:
+          - unique
+          - not_null
+          - relationships:
+              to: ref('dim_date')
+              field: date
+
+  - name: dim_special_day
+    columns:
+      - name: date
+        data_tests:
+          - unique
+          - not_null
+          - relationships:
+              to: ref('dim_date')
+              field: date
+
+  - name: dim_temperature
+    columns:
+      - name: date
+        data_tests:
+          - unique
+          - not_null
+          - relationships:
+              to: ref('dim_date')
+              field: date
+
+  - name: dim_category
+    columns:
+      - name: id
+        data_tests:
+          - unique
+          - not_null
