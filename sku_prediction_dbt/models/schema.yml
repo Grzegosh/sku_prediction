@@ -42,3 +42,33 @@ models:
         data_tests:
           - unique
           - not_null
+
+  - name: dim_product
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments: 
+            combination_of_columns:
+              - sku_id
+              - valid_from
+    columns:
+      - name: sku_id
+        data_tests:
+          - not_null
+      - name: valid_from
+        data_tests:
+          - not_null
+
+  - name: dim_customer
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments: 
+            combination_of_columns:
+              - id
+              - valid_from
+    columns:
+      - name: id
+        data_tests:
+          - not_null
+      - name: valid_from
+        data_tests:
+          - not_null
