@@ -11,6 +11,7 @@ WITH base AS (
         ,line_revenue
         ,order_status
         ,is_stockout_attempt
+        ,UPPER(TRIM(channel)) AS channel
         ,ROW_NUMBER() OVER (
             PARTITION BY order_id, order_line_id
             ORDER BY _ingested_at ASC
@@ -38,4 +39,5 @@ SELECT
     ,ROUND(CAST(quantity * unit_price_raw AS DECIMAL),2 ) AS revenue
     ,order_status
     ,is_stockout_attempt
+    ,UPPER(TRIM(channel)) AS channel
 FROM deduped
