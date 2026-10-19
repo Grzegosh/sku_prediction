@@ -12,5 +12,3 @@ FROM
 	_source
 WHERE
 	special_day_name IS NOT NULL
-ORDER BY
-	date DESC

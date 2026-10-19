@@ -26,7 +26,7 @@ models:
               to: ref('dim_date')
               field: date
 
-  - name: dim_temperature
+  - name: fact_weather
     columns:
       - name: date
         data_tests:
@@ -80,8 +80,6 @@ models:
             combination_of_columns:
               - order_id
               - order_line_id
-              - sku_id
-              - customer_id
     columns:
       - name: order_id
         data_tests:
@@ -95,3 +93,13 @@ models:
       - name: customer_id
         data_tests:
           - not_null
+
+  - name: fact_sales_agg_daily_sku_channel
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - date
+              - sku_id
+              - channel
+

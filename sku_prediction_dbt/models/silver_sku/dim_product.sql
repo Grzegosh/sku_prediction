@@ -5,6 +5,7 @@ WITH versions AS (
         ,category_id
         ,brand
         ,current_price
+        ,launch_date
         ,CAST(discontinued_date AS DATE) AS discontinued_date
         ,CAST(ingested_at AS DATE) AS valid_from
         ,ROW_NUMBER() OVER (
@@ -33,6 +34,7 @@ SELECT
     ,current_price
     ,discontinued_date
     ,valid_from
+    ,CAST(launch_date AS DATE) AS launch_date
     ,LEAST(valid_to, discontinued_date - 1) AS valid_to
 FROM first_transform
 WHERE discontinued_date IS NULL

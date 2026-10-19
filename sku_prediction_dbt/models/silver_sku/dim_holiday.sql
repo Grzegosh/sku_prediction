@@ -12,5 +12,3 @@ FROM
 	_source
 WHERE
 	holiday_name IS NOT NULL
-ORDER BY
-	date DESC

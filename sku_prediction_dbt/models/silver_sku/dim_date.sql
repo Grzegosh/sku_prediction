@@ -21,11 +21,12 @@ SELECT
 	date
 	,CAST(EXTRACT(isoyear FROM date) AS INT) AS iso_year
 	,CAST(EXTRACT(month FROM date) AS INT) AS month
-	,TO_CHAR(date, 'Month') AS month_name
+	,TO_CHAR(date, 'FMMonth') AS month_name
 	,EXTRACT(isodow FROM date) AS iso_day_of_week
-	,TO_CHAR(date, 'Day') AS day_name
+	,TO_CHAR(date, 'FMDay') AS day_name
 	,CAST(EXTRACT(day FROM date) AS INT) AS day_of_month
 	,CAST(DATE_PART('doy', date) AS INT) AS day_of_year
+    ,CAST(EXTRACT(quarter FROM date) AS INT) AS quarter
 	,CAST(EXTRACT(week FROM date) AS INT) AS iso_week_of_year
     ,CASE
         WHEN holiday_name IS NULL THEN 0
@@ -38,6 +39,7 @@ SELECT
 	END AS is_commercial_event
 	,commercial_event_name
 	,is_payday_window
+    ,is_weekend
 FROM
 	_source s
 
@@ -86,13 +88,16 @@ FROM
 SELECT
     ft.date
     ,ft.iso_year
+    ,ft.quarter
     ,ft.month
     ,ft.month_name
     ,ft.iso_day_of_week
+    ,ft.day_of_year
     ,ft.day_name
     ,ft.day_of_month
     ,ft.iso_week_of_year
     ,ft.is_holiday
+    ,ft.is_weekend
     ,ft.holiday_name
     ,cdth.next_holiday_in
     ,ft.is_commercial_event
