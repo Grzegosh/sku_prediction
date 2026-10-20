@@ -35,6 +35,9 @@ models:
           - relationships:
               to: ref('dim_date')
               field: date
+      - name: temperature_c
+        data_tests:
+          - not_null
 
   - name: dim_category
     columns:
@@ -103,3 +106,39 @@ models:
               - sku_id
               - channel
 
+  - name: fact_sales_agg_daily_sku
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - date
+              - sku_id
+    columns:
+      - name: date
+        data_tests:
+          - not_null
+      - name: sku_id
+        data_tests:
+          - not_null
+
+  - name: fact_sales_agg_daily_channel
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - date
+              - channel
+    columns:
+      - name: date
+        data_tests:
+          - not_null
+      - name: channel
+        data_tests:
+          - not_null
+
+  - name: fact_sales_agg_daily
+    columns:
+      - name: date
+        data_tests:
+          - not_null
+          - unique
