@@ -84,7 +84,60 @@ SELECT
     ,ABS(base_date - next_special_day) as next_special_day_in
 FROM
     calc_min_date_to_special_day
+
+), _date_of_previous_holiday AS (
+
+SELECT
+	ft.date
+	,MAX(dh.date) AS date_of_previous_holiday
+FROM
+	_first_trans ft
+LEFT JOIN
+	{{ ref('dim_holiday') }} dh
+ON
+	ft.date >= dh.date
+GROUP BY
+	ft.date
+
+), _days_since_last_holiday AS (
+
+SELECT
+	doph.date
+	,ABS(date - date_of_previous_holiday) AS days_since_last_holiday
+FROM
+	_date_of_previous_holiday doph
+
+
+
+
+), _date_of_previous_special_day AS (
+
+SELECT
+	ft.date
+	,MAX(dh.date) AS date_of_previous_special_day
+FROM
+	_first_trans ft
+LEFT JOIN
+	{{ ref('dim_special_day') }} dh
+ON
+	ft.date >= dh.date
+GROUP BY
+	ft.date
+
+
+
+), _days_since_last_special_day AS (
+
+SELECT
+	dopsd.date
+	,ABS(dopsd.date - dopsd.date_of_previous_special_day) AS days_since_last_special_day
+FROM
+	_date_of_previous_special_day dopsd
+
+
 )
+
+
 SELECT
     ft.date
     ,ft.iso_year
@@ -100,9 +153,11 @@ SELECT
     ,ft.is_weekend
     ,ft.holiday_name
     ,cdth.next_holiday_in
+	,dslh.days_since_last_holiday
     ,ft.is_commercial_event
     ,ft.commercial_event_name
     ,cdtsd.next_special_day_in
+	,dslsd.days_since_last_special_day
     ,ft.is_payday_window
 FROM
     _first_trans ft
@@ -114,3 +169,11 @@ LEFT JOIN
     calc_days_to_special_day cdtsd
 ON
     ft.date = cdtsd.base_date
+LEFT JOIN
+	_days_since_last_holiday dslh
+ON
+	ft.date = dslh.date
+LEFT JOIN
+	_days_since_last_special_day dslsd
+ON
+	ft.date = dslsd.date
