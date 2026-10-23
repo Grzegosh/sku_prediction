@@ -8,21 +8,12 @@ FROM
 ), black_friday_range AS (
 
 SELECT
-	ss.date_from
-	,d.date AS date_to
+	date - 6 AS date_from
+	,date AS date_to
 FROM
-	_dates d
-JOIN LATERAL
-	(SELECT
-		dd.date
-		,dd.date - 6 AS date_from
-	FROM
-		{{ ref('dim_date') }} dd
-	WHERE
-		commercial_event_name = 'Black Friday'
-	) ss
-ON
-	d.date = ss.date
+	_dates
+WHERE
+	commercial_event_name = 'Black Friday'
 
 ), count_per_date AS (
 
@@ -50,8 +41,7 @@ GROUP BY
 
 SELECT
 	cpd.order_date
-	,cpd.total_lines_count
-	,ROUND(lwp.promo_lines_count * 1.0 / cpd.total_lines_count * 1.0,3) AS test
+	,ROUND(lwp.promo_lines_count * 1.0 / cpd.total_lines_count, 3) AS test
 FROM
 	count_per_date cpd
 LEFT JOIN
@@ -62,27 +52,27 @@ ON
 ), dates_to_highlight_present AS (
 
 SELECT
-	r.order_date
+	order_date
 FROM
-	result r
+	result
 WHERE
 	test > 0.5
-	AND EXTRACT(MONTH FROM r.order_date) != 11
+	AND EXTRACT(MONTH FROM order_date) != 11
 
 ), dates_to_highlight_future AS (
 
 -- reguła dla dat po ostatniej dacie sprzedaży (u nas 2026-2027):
 -- stały blok 2-15 stycznia i 1-14 lipca; okno Black Friday liczy black_friday_range
 SELECT
-	d.date AS order_date
+	date AS order_date
 FROM
-	_dates d
+	_dates
 WHERE
-	d.date > (SELECT MAX(order_date) FROM {{ ref('fact_sales') }})
+	date > (SELECT MAX(order_date) FROM {{ ref('fact_sales') }})
 	AND (
-		(EXTRACT(MONTH FROM d.date) = 1 AND EXTRACT(DAY FROM d.date) BETWEEN 2 AND 15)
+		(EXTRACT(MONTH FROM date) = 1 AND EXTRACT(DAY FROM date) BETWEEN 2 AND 15)
 		OR
-		(EXTRACT(MONTH FROM d.date) = 7 AND EXTRACT(DAY FROM d.date) BETWEEN 1 AND 14)
+		(EXTRACT(MONTH FROM date) = 7 AND EXTRACT(DAY FROM date) BETWEEN 1 AND 14)
 	)
 
 ), dates_to_highlight AS (
@@ -91,10 +81,36 @@ SELECT order_date FROM dates_to_highlight_present
 UNION
 SELECT order_date FROM dates_to_highlight_future
 
-)
+), daily_mode AS (
+
+-- dominanta rabatu w każdym dniu sprzedaży
+SELECT
+	order_date
+	,MODE() WITHIN GROUP (ORDER BY discount_rate) AS discount_rate
+FROM
+	{{ ref('fact_sales') }}
+GROUP BY
+	order_date
+
+), rate_per_month AS (
+
+-- jeden rabat na miesiąc (styczeń, lipiec, listopad), z dni, w których dominanta jest różna od zera;
+-- sprawdzone: w każdym z tych miesięcy jest dokładnie jedna taka wartość
+SELECT
+	CAST(EXTRACT(MONTH FROM order_date) AS INT) AS month_no
+	,MAX(discount_rate) AS discount_rate
+FROM
+	daily_mode
+WHERE
+	discount_rate > 0
+GROUP BY
+	CAST(EXTRACT(MONTH FROM order_date) AS INT)
+
+), flagged AS (
 
 SELECT
 	d.date
+	,CAST(EXTRACT(MONTH FROM d.date) AS INT) AS month_no
 	,CASE
 		WHEN doh.order_date IS NOT NULL OR dfr.date_from IS NOT NULL THEN 1
 		ELSE 0
@@ -109,5 +125,21 @@ LEFT JOIN
 	black_friday_range dfr
 ON
 	d.date BETWEEN dfr.date_from AND dfr.date_to
+
+)
+
+SELECT
+	f.date
+	,f.is_discount_period
+	,CASE
+		WHEN f.is_discount_period = 1 THEN rpm.discount_rate
+		ELSE 0
+	END AS discount_rate
+FROM
+	flagged f
+LEFT JOIN
+	rate_per_month rpm
+ON
+	f.month_no = rpm.month_no
 ORDER BY
-	d.date ASC
+	f.date
