@@ -149,3 +149,19 @@ models:
         data_tests:
           - not_null
           - unique
+
+  - name: dim_calendar
+    columns:
+      - name: date
+        data_tests:
+          - not_null
+          - unique
+      - name: temperature_c_forecast
+        data_tests:
+          - not_null
+      - name: is_discount_period
+        data_tests:
+          - not_null
+      - name: discount_rate
+        data_tests:
+          - not_null
