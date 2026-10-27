@@ -3,6 +3,7 @@ SELECT
 	,ROW_NUMBER() OVER(ORDER BY dd.date ASC) AS days_since_start
 	,dd.quarter
 	,dd.month
+	,dd.iso_year
 	,dd.iso_day_of_week
 	,dd.day_of_year
 	,dd.day_of_month
