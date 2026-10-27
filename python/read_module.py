@@ -72,6 +72,7 @@ class ReadData:
                 df[col] = df[col].astype(float)
             elif isinstance(first, date):
                 df[col] = pd.to_datetime(df[col])
+                df[col] = [x.date() for x in df[col]]
 
         return df
 
