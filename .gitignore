@@ -224,3 +224,7 @@ main.py
 
 # Dbt 
 .user.yml
+
+# Notebooks
+
+.virtual_documents
