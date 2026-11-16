@@ -226,6 +226,10 @@ main.py
 .user.yml
 
 # Notebooks
-
-.virtual_documents
+\.virtual_documents
 notes.md
+
+# Pliki robocze (plan i wiedza o danych)
+PLAN_KROKOW.md
+WIEDZA_O_DANYCH.md
+AKTUALNY_KROK.md
